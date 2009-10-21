@@ -10,11 +10,11 @@ Net::LDAP::posixGroup - Creates new Net::LDAP::Entry objects for a posixGroup en
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -88,7 +88,10 @@ sub create{
 	if(defined($_[1])){
 		%args= %{$_[1]};
 	};
-	my @members=@{$_[2]};
+	my @members;
+	if (defined($_[2])) {
+		@members=@{$_[2]};
+	}
 
 	#error if name is not defined
 	if (!defined($args{name})) {
@@ -130,7 +133,7 @@ sub create{
 		$self->{errorString}='primary is a invalid value';
 		return undef;
 	}
-
+	
 	#forms the DN if it is using the gidNumber
 	if ($args{primary} eq 'gidNumber') {
 		$dn=$dn.$args{uid};
@@ -151,8 +154,8 @@ sub create{
 	$entry->dn($dn);
 
 	#adds the various attributes
-	$entry->add(objectClass=>['account', 'posixAccount'],
-				gidNumber=>[$args{gid}], cn=>[$args{cn}]);
+	$entry->add(objectClass=>['posixGroup', 'top'],
+				gidNumber=>[$args{gid}], cn=>[$args{name}]);
 
 	#adds the description if needed
 	if (defined($args{description})) {
